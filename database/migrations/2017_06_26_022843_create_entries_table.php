@@ -19,7 +19,7 @@ class CreateEntriesTable extends Migration
             $table->text('title');
             $table->text('content');
             $table->timestamps();
-            $table->index(['title', 'content'],
+            $table->index(['id', 'title', 'content'],
                           null,
                           'pgroonga');
         });
