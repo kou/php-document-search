@@ -15,7 +15,7 @@ class Entry extends Model
                        'title',
                        'content',
                        \DB::raw('pgroonga.score(entries) as score'))
-                ->whereRaw('title &@ :query OR content &@ :query',
+                ->whereRaw('title @@ :query OR content @@ :query',
                            ["query" => $search_query])
                 ->orderBy('score', 'DESC');
         } else {
