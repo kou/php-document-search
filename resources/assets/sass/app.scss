@@ -7,3 +7,28 @@
 
 // Bootstrap
 @import "node_modules/bootstrap-sass/assets/stylesheets/bootstrap";
+
+span.keyword {
+    @extend .label;
+    @extend .label-success;
+}
+
+div.entries {
+    @extend .list-group;
+
+    a {
+        @extend .list-group-item;
+
+        h4 {
+            @extend .list-group-item-heading;
+        }
+
+        span.score {
+            @extend .badge;
+        }
+
+        pre {
+            @extend .list-group-item-text;
+        }
+    }
+}
