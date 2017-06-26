@@ -15,7 +15,15 @@ class EntrySearchController extends Controller
      */
     public function index(Request $request)
     {
-        $entries = Entry::all();
-        return view('entry.search.index', ['entries' => $entries]);
+        $query = $request['query'];
+        $entries = Entry::select()
+            ->fullTextSearch($query)
+            ->limit(10)
+            ->get();
+        return view('entry.search.index',
+                    [
+                        'entries' => $entries,
+                        'query' => $query,
+                    ]);
     }
 }

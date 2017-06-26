@@ -11,4 +11,4 @@
 |
 */
 
-Route::get('/', 'EntrySearchController@index');
+Route::get('/', 'EntrySearchController@index')->name('search');
