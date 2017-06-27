@@ -12,3 +12,4 @@
 */
 
 Route::get('/', 'EntrySearchController@index')->name('search');
+Route::get('/terms/', 'TermSearchController@index')->name('terms');

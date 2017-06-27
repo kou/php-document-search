@@ -7,6 +7,32 @@
 
 require('./bootstrap');
 
+import $ from 'jquery';
+window.$ = window.jQuery = $;
+import 'jquery-ui/ui/widgets/autocomplete.js';
+
+$('#query').autocomplete({
+    source: function(request, response) {
+	$.ajax({
+	    url: "/terms/",
+	    dataType: "json",
+	    data: {
+		query: this.term
+	    },
+	    success: function(data) {
+		console.log(data);
+		response(data);
+	    },
+	    error: function(xhr, status, error) {
+		console.log("error");
+		console.log(status);
+		console.log(error);
+	    }
+	})
+    }
+});
+
+
 window.Vue = require('vue');
 
 /**
