@@ -64,11 +64,11 @@ class Entry extends Model
         }
     }
 
-    public function arrayValue($column)
+    public function getContentSnippetsAttribute($value)
     {
         return array_map(function ($element) {
                              return preg_replace('/\\\\(.)/', '$1', $element);
                          },
-                         explode('","', substr($this->$column, 2, -2)));
+                         explode('","', substr($value, 2, -2)));
     }
 }

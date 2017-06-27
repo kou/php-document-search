@@ -17,7 +17,7 @@
                      {!! $entry->highlighted_title !!}
                      <span class="score">{{ $entry->score }}</span>
                 </h4>
-                @foreach ($entry->arrayValue('content_snippets') as $snippet)
+                @foreach ($entry->content_snippets as $snippet)
                     <pre class="snippet">{!! $snippet !!}</pre>
                 @endforeach
            </a>
