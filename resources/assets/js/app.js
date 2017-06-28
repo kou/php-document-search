@@ -20,7 +20,6 @@ $('#query').autocomplete({
 		query: this.term
 	    },
 	    success: function(data) {
-		console.log(data);
 		response(data);
 	    },
 	    error: function(xhr, status, error) {
