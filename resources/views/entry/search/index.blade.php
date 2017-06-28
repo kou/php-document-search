@@ -20,7 +20,7 @@
                 @foreach ($entry->content_snippets as $snippet)
                     <pre class="snippet">{!! $snippet !!}</pre>
                 @endforeach
-           </a>
+            </a>
         @endforeach
     </div>
 @endsection
