@@ -92,7 +92,7 @@ class RegisterTerms extends Command
                     $nouns = [];
                     continue;
                 }
-                if (pgreg_match("/^\"/u", $surface) || $surface == "—") {
+                if (preg_match("/^\"/u", $surface) || $surface == "—") {
                     $this->flushContinuousNouns($nouns);
                     $nouns = [];
                     continue;
