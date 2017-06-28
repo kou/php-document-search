@@ -1,9 +1,9 @@
 @extends('layouts.app')
 
-@section('title', 'PHP Document Search')
+@section('title', 'PHP document search')
 
 @section('content')
-    <h1>PHP Document Search</h1>
+    <h1>PHP document search</h1>
 
     <form action="{{ route('search') }}" method="get">
         <input id="query" name="query" type="search" value="{{ $query }}">
