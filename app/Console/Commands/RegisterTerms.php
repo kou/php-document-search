@@ -23,6 +23,8 @@ class RegisterTerms extends Command
      */
     protected $description = 'Register terms for auto complete';
 
+    private $processed_surfaces = [];
+
     /**
      * Create a new command instance.
      *
@@ -112,7 +114,6 @@ class RegisterTerms extends Command
             fclose($pipes[1]);
 
             proc_close($mecab);
-            echo("done\n");
         }
     }
 
@@ -135,7 +136,7 @@ class RegisterTerms extends Command
         if (count($nouns) == 1) {
             $surface = $nouns[0][0];
             $reading = $nouns[0][1];
-            echo("Single noun: <$surface><$reading>\n");
+            // echo("Single noun: <$surface><$reading>\n");
             $this->registerTerm($surface, $reading);
         } else if (count($nouns) > 1) {
             $concatenated_surface = "";
@@ -146,7 +147,7 @@ class RegisterTerms extends Command
                 $concatenated_surface .= $surface;
                 $concatenated_reading .= $reading;
             }
-            echo("Continuous nouns: <$concatenated_surface><$concatenated_reading>\n");
+            // echo("Continuous nouns: <$concatenated_surface><$concatenated_reading>\n");
             $this->registerTerm($concatenated_surface, $concatenated_reading);
         }
     }
@@ -156,8 +157,13 @@ class RegisterTerms extends Command
         $label = $surface;
         $surface = strtolower($label);
 
+        if (array_key_exists($surface, $this->processed_surfaces))
+            return;
+
         if ($this->termExist($surface))
             return;
+
+        $this->processed_surfaces[$surface] = true;
 
         $term = new Term();
         $term->term = $surface;
