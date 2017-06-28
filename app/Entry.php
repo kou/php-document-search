@@ -11,9 +11,8 @@ class Entry extends Model
     {
         if ($search_query) {
             return $query
-                ->select('id',
-                       'url',
-                       \DB::raw('pgroonga.score(entries) AS score'))
+                ->select('id', 'url')
+                ->selectRaw('pgroonga.score(entries) AS score')
                 ->highlightHTML('title', $search_query)
                 ->snippetHTML('content', $search_query)
                 ->whereRaw('title @@ ? OR content @@ ?',
@@ -21,9 +20,8 @@ class Entry extends Model
                 ->orderBy('score', 'DESC');
         } else {
             return $query
-                ->select('id',
-                         'url',
-                         \DB::raw('0 AS score'))
+                ->select('id', 'url')
+                ->selectRaw('0 AS score')
                 ->highlightHTML('title', null)
                 ->snippetHTML('content', null)
                 ->orderBy('id');
