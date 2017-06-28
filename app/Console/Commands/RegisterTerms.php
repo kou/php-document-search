@@ -48,7 +48,13 @@ class RegisterTerms extends Command
             );
             $mecab = proc_open('mecab', $descriptor_spec, $pipes);
 
-            fwrite($pipes[0], $entry->title);
+            $all_text = $entry->title . " ";
+            $all_text .= preg_replace("/\n/", " ", $entry->content);
+            preg_match_all("/.{1,1024}/u", $all_text, $chunks);
+            foreach ($chunks as $chunk) {
+                fwrite($pipes[0], $chunk[0]);
+                fflush($pipes[0]);
+            }
             fclose($pipes[0]);
 
             $nouns = [];
@@ -68,7 +74,12 @@ class RegisterTerms extends Command
                 if (count($components) > 7) {
                     $reading = $components[7];
                 } else {
-                    $reading = null;
+                    $reading = $this->guessReading($surface);
+                }
+
+                if (count($nouns) > 0 && $surface == "_") {
+                    $nouns[] = [$surface, $reading];
+                    continue;
                 }
 
                 if ($class != "名詞") {
@@ -81,8 +92,17 @@ class RegisterTerms extends Command
                     $nouns = [];
                     continue;
                 }
-                if (!$reading) {
-                    $reading = $this->guessReading($surface);
+                if (pgreg_match("/^\"/u", $surface) || $surface == "—") {
+                    $this->flushContinuousNouns($nouns);
+                    $nouns = [];
+                    continue;
+                }
+
+                if (count($nouns) == 1 &&
+                    $this->isAlphabetOnly($nouns[0][0]) &&
+                    $this->isAlphabetOnly($surface)) {
+                    $this->flushContinuousNouns($nouns);
+                    $nouns = [];
                 }
 
                 $nouns[] = [$surface, $reading];
@@ -91,7 +111,13 @@ class RegisterTerms extends Command
             fclose($pipes[1]);
 
             proc_close($mecab);
+            echo("done\n");
         }
+    }
+
+    private function isAlphabetOnly($text)
+    {
+        return preg_match("/^[a-zA-Z\\\\]+$/", $text);
     }
 
     private function guessReading($surface)

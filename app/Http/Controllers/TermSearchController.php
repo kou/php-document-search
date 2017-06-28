@@ -16,15 +16,13 @@ class TermSearchController extends Controller
     public function index(Request $request)
     {
         $query = $request["query"];
-        $terms = Term::select("label")
-            ->whereRaw("term &^ :query OR reading &^~ :query",
-                       ["query" => $query])
-            ->orderBy("term")
-            ->limit(10)
-            ->cursor();
+        $terms = Term::query()->complete($query);
         $data = [];
-        foreach ($terms as $term) {
-            $data[] = $term->label;
+        foreach ($terms->get() as $term) {
+            $data[] = [
+                "value" => $term->label,
+                "label" => $term->highlighted_label,
+            ];
         }
         return response()->json($data);
     }

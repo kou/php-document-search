@@ -30,7 +30,12 @@ $('#query').autocomplete({
 	    }
 	})
     }
-});
+}).autocomplete("instance")._renderItem = function(ul, item) {
+    return $("<li>")
+	.attr("data-value", item.value)
+	.append(item.label)
+	.appendTo(ul);
+};
 
 
 window.Vue = require('vue');

@@ -15,13 +15,18 @@ class CreateTermsTable extends Migration
     {
         Schema::create('terms', function (Blueprint $table) {
             $table->increments('id');
-            $table->text('term')->unique();
+            $table->text('term');
             $table->text('label');
             $table->text('reading');
             $table->timestamps();
             $table->index([
                               DB::raw('term pgroonga.text_term_search_ops_v2'),
                               DB::raw('reading pgroonga.text_term_search_ops_v2'),
+                          ],
+                          null,
+                          'pgroonga');
+            $table->index([
+                              DB::raw('term'),
                           ],
                           null,
                           'pgroonga');

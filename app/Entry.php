@@ -25,7 +25,8 @@ class Entry extends Model
                          'url',
                          \DB::raw('0 AS score'))
                 ->highlightHTML('title', null)
-                ->snippetHTML('content', null);
+                ->snippetHTML('content', null)
+                ->orderBy('id');
         }
     }
 
