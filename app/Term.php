@@ -18,7 +18,7 @@ class Term extends Model
                         ["query_select" => $search_query])
             ->whereRaw("term &^ :query OR reading &^~ :query OR term @@ :query",
                        ["query" => $search_query])
-            ->orderBy("term")
+            ->orderBy("label")
             ->limit(10);
     }
 }
