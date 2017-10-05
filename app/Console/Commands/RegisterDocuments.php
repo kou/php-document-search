@@ -81,8 +81,22 @@ class RegisterDocuments extends Command
     {
         $content_texts = $xpath->evaluate('/html/body/table/tr/td[2]/div[position() != 1]//text()');
         $content = '';
+        $previous_is_empty = false;
         foreach ($content_texts as $text) {
-            $content .= $text->nodeValue;
+            $trimed_content = trim($text->nodeValue);
+            if (empty($trimed_content)) {
+                $previous_is_empty = true;
+                continue;
+            }
+
+            if ($previous_is_empty) {
+                $content .= "\n";
+            }
+            $content .= $trimed_content;
+            if (preg_match("/\\n/", $trimed_content)) {
+                $content .= "\n";
+            }
+            $previous_is_empty = false;
         }
         $entry->content = $content;
     }
