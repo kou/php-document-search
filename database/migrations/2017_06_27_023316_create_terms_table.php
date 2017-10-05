@@ -20,17 +20,15 @@ class CreateTermsTable extends Migration
             $table->text('reading');
             $table->timestamps();
             $table->index([
-                              DB::raw('term pgroonga.text_term_search_ops_v2'),
-                              DB::raw('reading pgroonga.text_term_search_ops_v2'),
-                          ],
-                          null,
-                          'pgroonga');
-            $table->index([
-                              DB::raw('term'),
+                              DB::raw('reading pgroonga_text_term_search_ops_v2'),
                           ],
                           null,
                           'pgroonga');
         });
+        DB::statement("CREATE INDEX terms_term_index " .
+                      "ON terms " .
+                      "USING pgroonga (term) " .
+                      "WITH (tokenizer='TokenBigramSplitSymbolAlphaDigit')");
     }
 
     /**

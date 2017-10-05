@@ -12,10 +12,10 @@ class Entry extends Model
         if ($search_query) {
             return $query
                 ->select('id', 'url')
-                ->selectRaw('pgroonga.score(entries) AS score')
+                ->selectRaw('pgroonga_score(entries) AS score')
                 ->highlightHTML('title', $search_query)
                 ->snippetHTML('content', $search_query)
-                ->whereRaw('title @@ ? OR content @@ ?',
+                ->whereRaw('title &@~ ? OR content &@~ ?',
                            [$search_query, $search_query])
                 ->orderBy('score', 'DESC');
         } else {
@@ -34,8 +34,8 @@ class Entry extends Model
     {
         if ($search_query) {
             return $query
-                ->selectRaw("pgroonga.highlight_html($column, " .
-                            "pgroonga.query_extract_keywords(?)) " .
+                ->selectRaw("pgroonga_highlight_html($column, " .
+                            "pgroonga_query_extract_keywords(?)) " .
                             "AS highlighted_$column",
                             [$search_query]);
         } else {
@@ -53,8 +53,8 @@ class Entry extends Model
     {
         if ($search_query) {
             return $query
-                ->selectRaw("pgroonga.snippet_html($column, " .
-                            "pgroonga.query_extract_keywords(?)) " .
+                ->selectRaw("pgroonga_snippet_html($column, " .
+                            "pgroonga_query_extract_keywords(?)) " .
                             "AS {$column}_snippets",
                             [$search_query]);
         } else {

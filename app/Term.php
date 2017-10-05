@@ -12,11 +12,11 @@ class Term extends Model
         return $query
             ->select("label")
             /* TODO: Share scopeHighlightHtml */
-            ->selectRaw("pgroonga.highlight_html(label, " .
-                        "pgroonga.query_extract_keywords(:query_select)) " .
+            ->selectRaw("pgroonga_highlight_html(label, " .
+                        "pgroonga_query_extract_keywords(:query_select)) " .
                         "AS highlighted_label",
                         ["query_select" => $search_query])
-            ->whereRaw("term &^ :query OR reading &^~ :query OR term @@ :query",
+            ->whereRaw("reading &^~ :query OR term &@~ :query",
                        ["query" => $search_query])
             ->orderBy("label")
             ->limit(10);
