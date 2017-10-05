@@ -13,7 +13,7 @@ class EnablePgroonga extends Migration
      */
     public function up()
     {
-        DB::statement('CREATE EXTENSION pgroonga;');
+        DB::statement('CREATE EXTENSION IF NOT EXISTS pgroonga;');
     }
 
     /**
