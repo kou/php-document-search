@@ -11,7 +11,7 @@ class Entry extends Model
     {
         if ($search_query) {
             return $query
-                ->select('id', 'url')
+                ->select('id', 'url', 'title', 'content')
                 ->selectRaw('pgroonga_score(entries) AS score')
                 ->highlightHTML('title', $search_query)
                 ->snippetHTML('content', $search_query)
@@ -20,7 +20,7 @@ class Entry extends Model
                 ->orderBy('score', 'DESC');
         } else {
             return $query
-                ->select('id', 'url')
+                ->select('id', 'url', 'title', 'content')
                 ->selectRaw('0 AS score')
                 ->highlightHTML('title', null)
                 ->snippetHTML('content', null)
@@ -69,5 +69,25 @@ class Entry extends Model
                              return preg_replace('/\\\\(.)/', '$1', $element);
                          },
                          explode('","', substr($value, 2, -2)));
+    }
+
+    public function scopeSimilarSearch(\Illuminate\Database\Eloquent\Builder $query,
+                                       $text)
+    {
+        return $query
+            ->select('id', 'url', 'title')
+            ->selectRaw('pgroonga_score(entries) AS score')
+            ->whereRaw("(title || ' ' || content) &@* ?",
+                       [$text])
+            ->orderBy('score', 'DESC');
+    }
+
+    public function similarEntries()
+    {
+        return Entry::query()
+            ->similarSearch("{$this->title} {$this->content}")
+            ->whereRaw("id <> ?", $this->id)
+            ->limit(3)
+            ->get();
     }
 }
