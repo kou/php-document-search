@@ -43,83 +43,90 @@ class RegisterTerms extends Command
     public function handle()
     {
         foreach (Entry::query()->cursor() as $entry) {
-            $descriptor_spec = array(
-                0 => array("pipe", "r"),
-                1 => array("pipe", "w"),
-                2 => array("pipe", "w"),
-            );
-            $mecab = proc_open('mecab', $descriptor_spec, $pipes);
-
-            $all_text = $entry->title . " ";
-            $all_text .= preg_replace("/\n/", " ", $entry->content);
-            preg_match_all("/.{1,1024}/u", $all_text, $chunks);
-            foreach ($chunks as $chunk) {
-                fwrite($pipes[0], $chunk[0]);
-                fflush($pipes[0]);
-            }
-            fclose($pipes[0]);
-
-            $nouns = [];
-            while (true) {
-                $line = rtrim(fgets($pipes[1]));
-                if ($line == "EOS") {
-                    break;
-                }
-
-                $components = explode("\t", $line, 2);
-                $surface = $components[0];
-                $attributes = $components[1];
-
-                $components = explode(",", $attributes);
-                $class = $components[0];
-                $subclass1 = $components[1];
-                if (count($components) > 7) {
-                    $reading = $components[7];
-                } else {
-                    $reading = $this->guessReading($surface);
-                }
-
-                if (count($nouns) > 0 && $surface == "_") {
-                    $nouns[] = [$surface, $reading];
-                    continue;
-                }
-
-                if ($class != "名詞") {
-                    $this->flushContinuousNouns($nouns);
-                    $nouns = [];
-                    continue;
-                }
-                if ($subclass1 == "数") {
-                    $this->flushContinuousNouns($nouns);
-                    $nouns = [];
-                    continue;
-                }
-                if (preg_match("/^[\"'\\-()!=\\[\\]*:\\/\\\\$%.?]/u", $surface) ||
-                    $surface == "—") {
-                    $this->flushContinuousNouns($nouns);
-                    $nouns = [];
-                    continue;
-                }
-
-                if (count($nouns) == 1 &&
-                    $this->isAlphabetOnly($nouns[0][0]) &&
-                    $this->isAlphabetOnly($surface)) {
-                    $this->flushContinuousNouns($nouns);
-                    $nouns = [];
-                }
-
-                $nouns[] = [$surface, $reading];
-            }
-            $this->flushContinuousNouns($nouns);
-            fclose($pipes[1]);
-
-            proc_close($mecab);
+            $this->processText($entry->title);
+            $this->processText(preg_replace("/\n/", " ", $entry->content));
         }
+    }
+
+    private function processText($text)
+    {
+        $descriptor_spec = array(
+            0 => array("pipe", "r"),
+            1 => array("pipe", "w"),
+            2 => array("pipe", "w"),
+        );
+        $mecab = proc_open('mecab', $descriptor_spec, $pipes);
+
+        preg_match_all("/.{1,1024}/u", $text, $chunks);
+        foreach ($chunks as $chunk) {
+            fwrite($pipes[0], $chunk[0]);
+            fflush($pipes[0]);
+        }
+        fclose($pipes[0]);
+
+        // echo("Text: $text\n");
+        $nouns = [];
+        while (true) {
+            $line = rtrim(fgets($pipes[1]));
+            if ($line == "EOS") {
+                break;
+            }
+
+            $components = explode("\t", $line, 2);
+            $surface = $components[0];
+            $attributes = $components[1];
+
+            $components = explode(",", $attributes);
+            $class = $components[0];
+            $subclass1 = $components[1];
+            if (count($components) > 7) {
+                $reading = $components[7];
+            } else {
+                $reading = $this->guessReading($surface);
+            }
+
+            if (count($nouns) > 0 && $surface == "_") {
+                $nouns[] = [$surface, $reading];
+                continue;
+            }
+
+            if ($class != "名詞") {
+                $this->flushContinuousNouns($nouns);
+                $nouns = [];
+                continue;
+            }
+            if ($subclass1 == "数" ||
+                $subclass1 == "サ変接続" ||
+                $subclass1 == "非自立") {
+                $this->flushContinuousNouns($nouns);
+                $nouns = [];
+                continue;
+            }
+            if (preg_match("/^[\"'\\-()!=\\[\\]*:\\/\\\\$%.?]/u", $surface) ||
+                $surface == "—") {
+                $this->flushContinuousNouns($nouns);
+                $nouns = [];
+                continue;
+            }
+
+            if (count($nouns) == 1 &&
+                $this->isAlphabetOnly($nouns[0][0]) &&
+                $this->isAlphabetOnly($surface)) {
+                $this->flushContinuousNouns($nouns);
+                $nouns = [];
+            }
+
+            $nouns[] = [$surface, $reading];
+        }
+        $this->flushContinuousNouns($nouns);
+        fclose($pipes[1]);
+
+        proc_close($mecab);
     }
 
     private function isAlphabetOnly($text)
     {
-        return preg_match("/^[a-zA-Z\\\\]+$/", $text);
+        return preg_match("/^[a-zA-Z_\\\\]+$/", $text);
     }
 
     private function guessReading($surface)
