@@ -16,7 +16,7 @@ class Entry extends Model
                 ->highlightHTML('title', $search_query)
                 ->snippetHTML('content', $search_query)
                 ->whereRaw('title &@~ ? OR content &@~ ?',
-                           [$search_query, $search_query])
+                           [">(${search_query})", $search_query])
                 ->orderBy('score', 'DESC');
         } else {
             return $query
