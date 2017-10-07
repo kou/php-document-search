@@ -96,14 +96,14 @@ class RegisterTerms extends Command
                 continue;
             }
             if ($subclass1 == "数" ||
-                $subclass1 == "サ変接続" ||
                 $subclass1 == "非自立") {
                 $this->flushContinuousNouns($nouns);
                 $nouns = [];
                 continue;
             }
             if (preg_match("/^[\"'\\-()!=\\[\\]*:\\/\\\\$%.?]/u", $surface) ||
-                $surface == "—") {
+                $surface == "—" ||
+                $surface == "»") {
                 $this->flushContinuousNouns($nouns);
                 $nouns = [];
                 continue;
