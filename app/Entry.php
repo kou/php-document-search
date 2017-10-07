@@ -15,8 +15,10 @@ class Entry extends Model
                 ->selectRaw('pgroonga_score(entries) AS score')
                 ->highlightHTML('title', $search_query)
                 ->snippetHTML('content', $search_query)
-                ->whereRaw('title &@~ ? OR content &@~ ?',
-                           [">(${search_query})", $search_query])
+                ->whereRaw("title &@~ pgroonga_query_expand(?, ?, ?, ?) OR " .
+                           "content &@~ pgroonga_query_expand(?, ?, ?, ?)",
+                           ["synonyms", "term", "synonym", ">({$search_query})",
+                            "synonyms", "term", "synonym", $search_query])
                 ->orderBy('score', 'DESC');
         } else {
             return $query
@@ -35,9 +37,10 @@ class Entry extends Model
         if ($search_query) {
             return $query
                 ->selectRaw("pgroonga_highlight_html($column, " .
-                            "pgroonga_query_extract_keywords(?)) " .
+                            "pgroonga_query_extract_keywords(" .
+                            "pgroonga_query_expand(?, ?, ?, ?))) " .
                             "AS highlighted_$column",
-                            [$search_query]);
+                            ["synonyms", "term", "synonym", $search_query]);
         } else {
             return $query
                 ->selectRaw("pgroonga.highlight_html($column, " .
@@ -54,9 +57,10 @@ class Entry extends Model
         if ($search_query) {
             return $query
                 ->selectRaw("pgroonga_snippet_html($column, " .
-                            "pgroonga_query_extract_keywords(?)) " .
+                            "pgroonga_query_extract_keywords( " .
+                            "pgroonga_query_expand(?, ?, ?, ?))) " .
                             "AS {$column}_snippets",
-                            [$search_query]);
+                            ["synonyms", "term", "synonym", $search_query]);
         } else {
             return $query
                 ->selectRaw("ARRAY[]::text[] AS {$column}_snippets");
