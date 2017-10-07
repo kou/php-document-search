@@ -86,7 +86,7 @@ class Entry extends Model
     {
         return Entry::query()
             ->similarSearch("{$this->title} {$this->content}")
-            ->whereRaw("id <> ?", $this->id)
+            ->where("id", "<>", $this->id)
             ->limit(3)
             ->get();
     }
