@@ -58,7 +58,7 @@ class RegisterTerms extends Command
         $mecab = proc_open('mecab', $descriptor_spec, $pipes);
 
         preg_match_all("/.{1,1024}/u", $text, $chunks);
-        foreach ($chunks as $chunk) {
+        foreach ($chunks[0] as $chunk) {
             fwrite($pipes[0], $chunk[0]);
             fflush($pipes[0]);
         }
