@@ -61,8 +61,18 @@ class RegisterTerms extends Command
         );
         $mecab = proc_open('mecab', $descriptor_spec, $pipes);
 
+        $lines = [];
         preg_match_all("/.{1,1024}/u", $text, $chunks);
         foreach ($chunks[0] as $chunk) {
+            while (true) {
+                $reads = NULL;
+                $writes = [$pipes[0]];
+                $exceptions = NULL;
+                if (stream_select($reads, $writes, $exceptions, 0) !== 0) {
+                    break;
+                }
+                $lines[] = fgets($pipes[1]);
+            }
             fwrite($pipes[0], $chunk);
             fflush($pipes[0]);
         }
@@ -71,7 +81,11 @@ class RegisterTerms extends Command
         // echo("Text: $text\n");
         $nouns = [];
         while (true) {
-            $line = rtrim(fgets($pipes[1]));
+            if (count($lines) === 0) {
+                $lines[] = fgets($pipes[1]);
+            }
+            $line = array_shift($lines);
+            $line = rtrim($line);
             if ($line == "EOS") {
                 break;
             }
