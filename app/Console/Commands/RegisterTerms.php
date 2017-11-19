@@ -50,6 +50,10 @@ class RegisterTerms extends Command
 
     private function processText($text)
     {
+        if ($text === "") {
+            return;
+        }
+
         $descriptor_spec = array(
             0 => array("pipe", "r"),
             1 => array("pipe", "w"),
