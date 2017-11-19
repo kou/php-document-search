@@ -59,7 +59,7 @@ class RegisterTerms extends Command
 
         preg_match_all("/.{1,1024}/u", $text, $chunks);
         foreach ($chunks[0] as $chunk) {
-            fwrite($pipes[0], $chunk[0]);
+            fwrite($pipes[0], $chunk);
             fflush($pipes[0]);
         }
         fclose($pipes[0]);
