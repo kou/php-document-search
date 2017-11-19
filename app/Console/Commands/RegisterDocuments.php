@@ -72,14 +72,12 @@ class RegisterDocuments extends Command
             return;
         }
 
-        $entry->title = preg_replace("/\\APHP マニュアル: /",
-                                     "",
-                                     $title_node->wholeText);
+        $entry->title = $title_node->wholeText;
     }
 
     private function extract_content(Entry $entry, \DOMXPath $xpath)
     {
-        $content_texts = $xpath->evaluate('/html/body/table/tr/td[2]/div[position() != 1]//text()');
+        $content_texts = $xpath->evaluate('/html/body/div[@class != "manualnavbar"]//text()');
         $content = '';
         $previous_is_empty = false;
         foreach ($content_texts as $text) {
