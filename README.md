@@ -38,7 +38,20 @@ Setup database schema:
 % php artisan migrate
 ```
 
-TODO: How to setup PHP document.
+Generate PHP document. The following instructions may be broken. See
+also: http://doc.php.net/phd/docs/ .
+
+```console
+% sudo pear install doc.php.net/phd
+% sudo pear install doc.php.net/phd_php
+% sudo pear install doc.php.net/phd_pear
+% svn co https://svn.php.net/repository/phpdoc/modules/doc-ja ../phpdoc
+% cd ../phpdoc
+phpdoc% php doc-base/configure.php --with-lang=ja
+phpdoc% phd -d doc-base/.manual.xml -P PHP -f xhtml
+phpdoc% cd -
+% ln -s ../../phpdoc/output/php-chunked-xhtml public/doc
+```
 
 Register PHP document:
 
