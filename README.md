@@ -38,8 +38,25 @@ Setup database schema:
 % php artisan migrate
 ```
 
-Generate PHP document. The following instructions may be broken. See
-also: http://doc.php.net/phd/docs/ .
+Prepare PHP document to be searched. You have two options:
+
+  * Download generated PHP document
+
+  * Generate PHP document
+
+You can download generated PHP document from
+http://jp2.php.net/download-docs.php . You must choose "Many HTML
+files" version. You must extract it as `public/doc/`. Here are command
+lines to do this:
+
+```console
+% wget http://jp2.php.net/distributions/manual/php_manual_ja.tar.gz
+% tar xf php_manual_ja.tar.gz
+% mv php-chunked-xhtml public/doc
+```
+
+You can generate PHP document on your machine. Here are command lines
+to do this. See also: http://doc.php.net/phd/docs/ .
 
 ```console
 % sudo pear install doc.php.net/phd
